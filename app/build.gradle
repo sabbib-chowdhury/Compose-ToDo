@@ -245,6 +245,7 @@ dependencies {
     benchmarkImplementation libs.wisnu.foundation.test.debugnoop
 
 
+    implementation libs.androidx.glance.widgets
     ///////////////
     // UNIT TEST SUPPORT
     //////
