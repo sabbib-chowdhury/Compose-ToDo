@@ -2,7 +2,6 @@ package com.wisnu.kurniawan.composetodolist.features.widgets
 
 import android.content.Context
 import android.util.Log
-import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,6 +14,7 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -28,8 +28,7 @@ import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.wisnu.kurniawan.composetodolist.R
-import com.wisnu.kurniawan.composetodolist.features.host.data.HostEnvironment
-import com.wisnu.kurniawan.composetodolist.features.todo.all.data.AllEnvironment
+import com.wisnu.kurniawan.composetodolist.features.widgets.domain.AllListWidgetInteractor
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.isDarkMode
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toColorProviders
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toColorScheme
@@ -60,16 +59,17 @@ class TodoListWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         Log.d("LOG_TAG---", "TodoListWidget-provideGlance#46: ")
-        val allEnvironment = AllEnvironment.get(context)
-        val hostEnvironment = HostEnvironment.get(context)
+        val interactor = AllListWidgetInteractor.get(context)
 
-        val allList = allEnvironment.getList()
         provideContent {
             val coroutineScope = rememberCoroutineScope()
-            val todoLists by allList.collectAsState(emptyList())
-            val hostEnvironmentState by hostEnvironment.getTheme().collectAsState(Theme.SYSTEM)
+            val todoLists by interactor.allLists.collectAsState(emptyList())
+            val hostEnvironmentState by interactor.themes.collectAsState(Theme.SYSTEM)
             val themeColors = hostEnvironmentState.toColorScheme(context).toColorProviders(context)
-            Log.d("LOG_TAG---", "TodoListWidget-provideGlance#65: ${context.isDarkMode} ${themeColors.background}")
+            Log.d(
+                "LOG_TAG---",
+                "TodoListWidget-provideGlance#65: ${context.isDarkMode} ${themeColors.background}"
+            )
             GlanceTheme(themeColors) {
                 TodoWidget(
                     context.getString(R.string.todo_all),
@@ -78,7 +78,7 @@ class TodoListWidget : GlanceAppWidget() {
                     context
                 ) {
                     coroutineScope.launch {
-                        allEnvironment.toggleTaskStatus(it)
+                        interactor.toggleTaskStatus(it)
                     }
                 }
             }
@@ -86,7 +86,7 @@ class TodoListWidget : GlanceAppWidget() {
     }
 
     @Composable
-    fun TodoWidget(
+    private fun TodoWidget(
         toDoListName: String,
         toDoLists: List<ToDoList> = emptyList(),
         themeColorProvider: ColorProviders,
