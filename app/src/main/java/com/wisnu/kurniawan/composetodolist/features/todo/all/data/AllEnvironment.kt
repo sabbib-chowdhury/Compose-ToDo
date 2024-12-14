@@ -1,11 +1,15 @@
 package com.wisnu.kurniawan.composetodolist.features.todo.all.data
 
+import android.content.Context
+import com.wisnu.kurniawan.composetodolist.features.widgets.di.WidgetDependencies
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.local.provider.ToDoListProvider
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.local.provider.ToDoTaskProvider
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toggleStatusHandler
 import com.wisnu.kurniawan.composetodolist.foundation.wrapper.DateTimeProvider
 import com.wisnu.kurniawan.composetodolist.model.ToDoList
 import com.wisnu.kurniawan.composetodolist.model.ToDoTask
+import dagger.hilt.EntryPoint
+import dagger.hilt.EntryPoints
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -36,4 +40,12 @@ class AllEnvironment @Inject constructor(
         toDoTaskProvider.deleteTaskById(task.id)
     }
 
+    companion object {
+        fun get(context: Context): AllEnvironment {
+            return EntryPoints.get(
+                context.applicationContext,
+                WidgetDependencies::class.java
+            ).getAllEnvironment()
+        }
+    }
 }
