@@ -126,7 +126,7 @@ class TodoListWidget : GlanceAppWidget() {
             )
             LazyColumn(
                 modifier = GlanceModifier.fillMaxSize()
-                    .background(themeColorProvider.background)
+                    .background(themeColorProvider.secondaryContainer)
             ) {
                 items(todo.tasks) { item ->
                     Log.d("LOG_TAG---", "TodoListWidget-TodoList#117: ")
