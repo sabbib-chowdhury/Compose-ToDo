@@ -3,32 +3,38 @@ package com.wisnu.kurniawan.composetodolist.features.widgets
 import android.content.Context
 import android.util.Log
 import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.color.ColorProviders
 import androidx.glance.color.DayNightColorProvider
-import androidx.glance.color.isNightMode
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.wisnu.kurniawan.composetodolist.R
+import com.wisnu.kurniawan.composetodolist.features.host.data.HostEnvironment
 import com.wisnu.kurniawan.composetodolist.features.todo.all.data.AllEnvironment
+import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.isDarkMode
+import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toColorProviders
+import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toColorScheme
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
 import com.wisnu.kurniawan.composetodolist.foundation.theme.LightColorPalette
 import com.wisnu.kurniawan.composetodolist.foundation.theme.NightColorPalette
-import com.wisnu.kurniawan.composetodolist.foundation.theme.Shapes
-import com.wisnu.kurniawan.composetodolist.foundation.theme.Typography
+import com.wisnu.kurniawan.composetodolist.model.Theme
 import com.wisnu.kurniawan.composetodolist.model.ToDoList
 import com.wisnu.kurniawan.composetodolist.model.ToDoStatus
 
@@ -51,16 +57,19 @@ class TodoListWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         Log.d("LOG_TAG---", "TodoListWidget-provideGlance#46: ")
-        val todoList = allEnvironment.getList()
-        todoList.collect {
-            provideContent {
-                MaterialTheme(
-                    colorScheme = if (context.isNightMode) NightColorPalette else LightColorPalette,
-                    typography = Typography,
-                    shapes = Shapes,
-                ) {
-                    TodoWidget(context.getString(R.string.todo_all), it)
-                }
+        val allList = AllEnvironment.get(context).getList()
+        val hostEnvironment = HostEnvironment.get(context)
+        provideContent {
+            val todoLists by allList.collectAsState(emptyList())
+            val hostEnvironmentState by hostEnvironment.getTheme().collectAsState(Theme.SYSTEM)
+            val themeColors = hostEnvironmentState.toColorScheme(context).toColorProviders(context)
+            Log.d("LOG_TAG---", "TodoListWidget-provideGlance#65: ${context.isDarkMode}")
+            GlanceTheme(themeColors) {
+                TodoWidget(
+                    context.getString(R.string.todo_all),
+                    todoLists,
+                    themeColors
+                )
             }
         }
     }
@@ -68,48 +77,53 @@ class TodoListWidget : GlanceAppWidget() {
     @Composable
     fun TodoWidget(
         toDoListName: String,
-        toDoLists: List<ToDoList> = emptyList()
+        toDoLists: List<ToDoList> = emptyList(),
+        themeColorProvider: ColorProviders,
     ) {
         Column(
             modifier = GlanceModifier.fillMaxSize()
                 .padding(8.dp)
-                .background(MaterialTheme.colorScheme.surface),
+                .background(themeColorProvider.surface),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = toDoListName,
-                style = widgetTextStyle,
+                style = widgetTextStyle.copy(color = themeColorProvider.onSurface),
                 modifier = GlanceModifier.padding(bottom = 8.dp),
             )
-            TodoList(toDoLists)
+            TodoList(toDoLists, themeColorProvider)
         }
     }
 
     @Composable
     private fun TodoList(
         toDoLists: List<ToDoList>,
+        themeColorProvider: ColorProviders,
     ) {
         toDoLists.forEach { todo ->
             Text(
-                modifier = GlanceModifier.background(todo.color.toColor()),
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .background(todo.color.toColor()),
                 text = todo.name,
                 style = widgetTextStyle
             )
             LazyColumn(
                 modifier = GlanceModifier.fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(themeColorProvider.background)
             ) {
                 items(todo.tasks) { item ->
                     if (item.status == ToDoStatus.IN_PROGRESS)
-                        TodoItem(item.name)
+                        TodoItem(item.name, themeColorProvider)
                 }
             }
         }
     }
 
     @Composable
-    private fun TodoItem(name: String) {
-        Text(text = name, style = widgetTextStyle)
+    private fun TodoItem(name: String, themeColorProvider: ColorProviders) {
+        Text(text = name, style = widgetTextStyle.copy(color = themeColorProvider.onSurface))
     }
 
     internal fun setAllEnvironment(allEnvironment: AllEnvironment) {
