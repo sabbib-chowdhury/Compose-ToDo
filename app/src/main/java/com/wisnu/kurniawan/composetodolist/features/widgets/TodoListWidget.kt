@@ -6,14 +6,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
@@ -21,18 +26,23 @@ import androidx.glance.background
 import androidx.glance.color.ColorProviders
 import androidx.glance.color.DayNightColorProvider
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
+import androidx.glance.layout.wrapContentSize
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import com.wisnu.kurniawan.composetodolist.R
 import com.wisnu.kurniawan.composetodolist.features.widgets.domain.AllListWidgetInteractor
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.isDarkMode
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toColorProviders
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toColorScheme
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
+import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaDisabled
 import com.wisnu.kurniawan.composetodolist.foundation.theme.LightColorPalette
 import com.wisnu.kurniawan.composetodolist.foundation.theme.NightColorPalette
 import com.wisnu.kurniawan.composetodolist.model.Theme
@@ -115,21 +125,42 @@ class TodoListWidget : GlanceAppWidget() {
         context: Context = LocalContext.current,
         onClick: (ToDoTask) -> Unit,
     ) {
-        toDoLists.forEach { todo ->
-            Text(
-                modifier = GlanceModifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .background(todo.color.toColor()),
-                text = todo.name,
-                style = widgetTextStyle
-            )
-            LazyColumn(
-                modifier = GlanceModifier.fillMaxSize()
-                    .background(themeColorProvider.secondaryContainer)
-            ) {
+        LazyColumn(
+            modifier = GlanceModifier.fillMaxSize()
+                .background(themeColorProvider.secondaryContainer)
+        ) {
+            toDoLists.forEach { todo ->
+                item {
+                    Log.d("LOG_TAG---", "TodoListWidget-TodoList#119: ${todo.name}")
+                    Row(
+                        GlanceModifier.background(todo.color.toColor().copy(alpha = AlphaDisabled))
+                    ) {
+                        Box(
+                            GlanceModifier.cornerRadius(120.dp)
+                                .wrapContentSize()
+                                .background(todo.color.toColor()),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                modifier = GlanceModifier
+                                    .padding(vertical = 16.dp, horizontal = 8.dp),
+                                colorFilter = ColorFilter.tint(
+                                    ColorProvider(Color.White.copy(alpha = AlphaDisabled))
+                                ),
+                                provider = ImageProvider(R.drawable.ic_widget_more_horiz),
+                                contentDescription = todo.name
+                            )
+                        }
+                        Text(
+                            modifier = GlanceModifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp, horizontal = 8.dp),
+                            text = todo.name,
+                            style = widgetTextStyle
+                        )
+                    }
+                }
                 items(todo.tasks) { item ->
-                    Log.d("LOG_TAG---", "TodoListWidget-TodoList#117: ")
                     if (item.status == ToDoStatus.IN_PROGRESS)
                         TodoItem(item, todo.color, widgetTextStyle, context, onClick)
                 }
