@@ -25,9 +25,7 @@ class TodoListWidgetProvider : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget
         get() {
             Log.d("LOG_TAG---", "TodoListWidgetProvider-#17: $allEnvironment")
-            val todoListWidget = TodoListWidget()
-            todoListWidget.setAllEnvironment(allEnvironment)
-            return todoListWidget
+            return TodoListWidget()
         }
 
     override fun onEnabled(context: Context) {
@@ -37,12 +35,9 @@ class TodoListWidgetProvider : GlanceAppWidgetReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        Log.d("LOG_TAG---", "TodoListWidgetProvider-onReceive#44: ")
+        Log.d("LOG_TAG---", "TodoListWidgetProvider-onReceive#44: ${intent.action}")
         CoroutineScope(Dispatchers.IO).launch {
-            TodoListWidget().apply {
-                setAllEnvironment(allEnvironment)
-                updateAll(context)
-            }
+            TodoListWidget().updateAll(context)
         }
     }
 
