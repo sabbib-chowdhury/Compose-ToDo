@@ -6,6 +6,7 @@ import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -38,10 +39,11 @@ import com.wisnu.kurniawan.composetodolist.foundation.theme.NightColorPalette
 import com.wisnu.kurniawan.composetodolist.model.Theme
 import com.wisnu.kurniawan.composetodolist.model.ToDoList
 import com.wisnu.kurniawan.composetodolist.model.ToDoStatus
+import com.wisnu.kurniawan.composetodolist.model.ToDoTask
+import kotlinx.coroutines.launch
 
 class TodoListWidget : GlanceAppWidget() {
 
-    private lateinit var allEnvironment: AllEnvironment
     override val sizeMode: SizeMode
         get() = SizeMode.Responsive(
             setOf(
@@ -58,9 +60,12 @@ class TodoListWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         Log.d("LOG_TAG---", "TodoListWidget-provideGlance#46: ")
-        val allList = AllEnvironment.get(context).getList()
+        val allEnvironment = AllEnvironment.get(context)
         val hostEnvironment = HostEnvironment.get(context)
+
+        val allList = allEnvironment.getList()
         provideContent {
+            val coroutineScope = rememberCoroutineScope()
             val todoLists by allList.collectAsState(emptyList())
             val hostEnvironmentState by hostEnvironment.getTheme().collectAsState(Theme.SYSTEM)
             val themeColors = hostEnvironmentState.toColorScheme(context).toColorProviders(context)
@@ -71,7 +76,11 @@ class TodoListWidget : GlanceAppWidget() {
                     todoLists,
                     themeColors,
                     context
-                )
+                ) {
+                    coroutineScope.launch {
+                        allEnvironment.toggleTaskStatus(it)
+                    }
+                }
             }
         }
     }
@@ -81,7 +90,8 @@ class TodoListWidget : GlanceAppWidget() {
         toDoListName: String,
         toDoLists: List<ToDoList> = emptyList(),
         themeColorProvider: ColorProviders,
-        context: Context = LocalContext.current
+        context: Context = LocalContext.current,
+        onClick: (ToDoTask) -> Unit,
     ) {
         Column(
             modifier = GlanceModifier.fillMaxSize()
@@ -94,7 +104,7 @@ class TodoListWidget : GlanceAppWidget() {
                 style = widgetTextStyle.copy(color = themeColorProvider.onSurface),
                 modifier = GlanceModifier.padding(bottom = 8.dp),
             )
-            TodoList(toDoLists, themeColorProvider, context)
+            TodoList(toDoLists, themeColorProvider, context, onClick)
         }
     }
 
@@ -102,7 +112,8 @@ class TodoListWidget : GlanceAppWidget() {
     private fun TodoList(
         toDoLists: List<ToDoList>,
         themeColorProvider: ColorProviders,
-        context: Context = LocalContext.current
+        context: Context = LocalContext.current,
+        onClick: (ToDoTask) -> Unit,
     ) {
         toDoLists.forEach { todo ->
             Text(
@@ -120,7 +131,7 @@ class TodoListWidget : GlanceAppWidget() {
                 items(todo.tasks) { item ->
                     Log.d("LOG_TAG---", "TodoListWidget-TodoList#117: ")
                     if (item.status == ToDoStatus.IN_PROGRESS)
-                        TodoItem(item.name, item.status, todo.color, widgetTextStyle, context)
+                        TodoItem(item, todo.color, widgetTextStyle, context, onClick)
                 }
             }
         }
