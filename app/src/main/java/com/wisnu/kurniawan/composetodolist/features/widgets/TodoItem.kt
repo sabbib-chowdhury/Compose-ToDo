@@ -56,9 +56,9 @@ fun TodoItem(
         ) {
 
             val (image, color) = if (task.status == ToDoStatus.IN_PROGRESS) {
-                R.drawable.ic_round_radio_button_unchecked to ColorProvider(todoColor.toColor())
+                R.drawable.ic_widget_round_radio_button_unchecked to ColorProvider(todoColor.toColor())
             } else {
-                R.drawable.ic_round_check_circle to ColorProvider(
+                R.drawable.ic_widget_round_check_circle to ColorProvider(
                     todoColor.toColor().copy(alpha = AlphaDisabled)
                 )
             }
