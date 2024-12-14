@@ -28,22 +28,26 @@ import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaDisabled
 import com.wisnu.kurniawan.composetodolist.foundation.theme.DividerAlpha
 import com.wisnu.kurniawan.composetodolist.model.ToDoColor
 import com.wisnu.kurniawan.composetodolist.model.ToDoStatus
+import com.wisnu.kurniawan.composetodolist.model.ToDoTask
 
 @Composable
 fun TodoItem(
-    name: String,
-    todoStatus: ToDoStatus,
+    task: ToDoTask,
     todoColor: ToDoColor,
     widgetTextStyle: TextStyle,
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
+    onClick: (ToDoTask) -> Unit
 ) {
-    Column {
+    Column(
+        modifier = GlanceModifier
+            .clickable { onClick(task) }
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = GlanceModifier.padding(8.dp)
         ) {
 
-            val (image, color) = if (todoStatus == ToDoStatus.IN_PROGRESS) {
+            val (image, color) = if (task.status == ToDoStatus.IN_PROGRESS) {
                 R.drawable.ic_round_radio_button_unchecked to ColorProvider(todoColor.toColor())
             } else {
                 R.drawable.ic_round_check_circle to ColorProvider(todoColor.toColor().copy(alpha = AlphaDisabled))
@@ -53,16 +57,17 @@ fun TodoItem(
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(color),
                 modifier = GlanceModifier
-                    .padding(end = 4.dp)
+                    .padding(end = 8.dp)
                     .clickable {
-                        Log.d("LOG_TAG---", "-TodoItem#62: $name")
+                        onClick(task)
+                        Log.d("LOG_TAG---", "-TodoItem#62: $task")
                     }
             )
 
             Column {
                 Spacer(GlanceModifier.height(4.dp))
                 Text(
-                    text = name,
+                    text = task.name,
                     modifier = GlanceModifier.padding(bottom = 4.dp),
                     style = widgetTextStyle,
 //                        style = MaterialTheme.typography.labelMedium,
