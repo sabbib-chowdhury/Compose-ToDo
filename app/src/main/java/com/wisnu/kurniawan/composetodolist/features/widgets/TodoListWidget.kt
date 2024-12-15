@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -88,7 +87,7 @@ class TodoListWidget : GlanceAppWidget() {
                     context.getString(R.string.todo_all),
                     todoLists,
                     themeColors,
-                    context
+                    widgetTextStyle = widgetTextStyle,
                 ) {
                     coroutineScope.launch {
                         interactor.toggleTaskStatus(it)
@@ -98,85 +97,86 @@ class TodoListWidget : GlanceAppWidget() {
         }
     }
 
-    @Composable
-    fun TodoWidget(
-        toDoListName: String,
-        toDoLists: List<ToDoList> = emptyList(),
-        themeColorProvider: ColorProviders,
-        context: Context = LocalContext.current,
-        onClick: (ToDoTask) -> Unit,
-    ) {
-        Column(
-            modifier = GlanceModifier.fillMaxSize()
-                .padding(8.dp)
-                .background(themeColorProvider.surface),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = toDoListName,
-                style = widgetTextStyle.copy(color = themeColorProvider.onSurface),
-                modifier = GlanceModifier.padding(bottom = 8.dp),
-            )
-            TodoList(toDoLists, themeColorProvider, context, onClick)
-        }
-    }
+}
 
-    @Composable
-    private fun TodoList(
-        toDoLists: List<ToDoList>,
-        themeColorProvider: ColorProviders,
-        context: Context = LocalContext.current,
-        onClick: (ToDoTask) -> Unit,
+@Composable
+fun TodoWidget(
+    toDoListName: String,
+    toDoLists: List<ToDoList> = emptyList(),
+    themeColorProvider: ColorProviders,
+    widgetTextStyle: TextStyle = TextStyle(),
+    onClick: (ToDoTask) -> Unit,
+) {
+    Column(
+        modifier = GlanceModifier.fillMaxSize()
+            .padding(8.dp)
+            .background(themeColorProvider.surface),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        LazyColumn(
-            modifier = GlanceModifier.fillMaxSize()
-                .background(themeColorProvider.secondaryContainer)
-        ) {
-            toDoLists.forEach { todo ->
-                item {
-                    Log.d("LOG_TAG---", "TodoListWidget-TodoList#119: ${todo.name}")
-                    Row(
+        Text(
+            text = toDoListName,
+            style = widgetTextStyle.copy(color = themeColorProvider.onSurface),
+            modifier = GlanceModifier.padding(bottom = 8.dp),
+        )
+        TodoList(toDoLists, themeColorProvider, widgetTextStyle, onClick)
+    }
+}
+
+@Composable
+private fun TodoList(
+    toDoLists: List<ToDoList>,
+    themeColorProvider: ColorProviders,
+    widgetTextStyle: TextStyle,
+    onClick: (ToDoTask) -> Unit,
+) {
+    LazyColumn(
+        modifier = GlanceModifier.fillMaxSize()
+            .background(themeColorProvider.secondaryContainer)
+    ) {
+        toDoLists.forEach { todo ->
+            item {
+                Log.d("LOG_TAG---", "TodoListWidget-TodoList#119: ${todo.name}")
+                Row(
+                    modifier = GlanceModifier
+                        .background(todo.color.toColor().copy(alpha = AlphaMedium))
+                        .cornerRadius(4.dp)
+                        .padding(vertical = 8.dp, horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
                         modifier = GlanceModifier
-                            .background(todo.color.toColor().copy(alpha = AlphaMedium))
-                            .cornerRadius(4.dp)
-                            .padding(vertical = 8.dp, horizontal = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .size(36.dp)
+                            .cornerRadius(18.dp)
+                            .background(todo.color.toColor())
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
+                        Image(
                             modifier = GlanceModifier
                                 .size(36.dp)
-                                .cornerRadius(18.dp)
-                                .background(todo.color.toColor())
-                                .padding(8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                modifier = GlanceModifier
-                                    .size(36.dp)
-                                    .padding(vertical = 8.dp, horizontal = 8.dp),
-                                provider = ImageProvider(R.drawable.ic_widget_more_horiz),
-                                contentDescription = todo.name
-                            )
-                        }
-                        val titleSmall = MaterialTheme.typography.titleSmall
-                        Text(
-                            modifier = GlanceModifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = todo.name,
-                            style = TextStyle(
-                                color = widgetTextStyle.color,
-                                fontSize = titleSmall.fontSize,
-                                fontWeight = FontWeight.Bold,
-                                fontStyle = FontStyle.Normal,
-                            )
+                                .padding(vertical = 8.dp, horizontal = 8.dp),
+                            provider = ImageProvider(R.drawable.ic_widget_more_horiz),
+                            contentDescription = todo.name
                         )
                     }
+                    val titleSmall = MaterialTheme.typography.titleSmall
+                    Text(
+                        modifier = GlanceModifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        text = todo.name,
+                        style = TextStyle(
+                            color = widgetTextStyle.color,
+                            fontSize = titleSmall.fontSize,
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Normal,
+                        )
+                    )
                 }
-                items(todo.tasks) { item ->
-                    if (item.status == ToDoStatus.IN_PROGRESS)
-                        TodoItem(item, todo.color, widgetTextStyle, context, onClick)
-                }
+            }
+            items(todo.tasks) { item ->
+                if (item.status == ToDoStatus.IN_PROGRESS)
+                    TodoItem(item, todo.color, onClick)
             }
         }
     }
@@ -186,7 +186,7 @@ class TodoListWidget : GlanceAppWidget() {
 @Composable
 private fun TodoWidgetPreview() {
     GlanceTheme {
-        TodoListWidget().TodoWidget(
+        TodoWidget(
             toDoListName = "Todo",
             toDoLists = listOf(
                 ToDoList(
@@ -205,6 +205,12 @@ private fun TodoWidgetPreview() {
                     createdAt = LocalDateTime.now(),
                     updatedAt = LocalDateTime.now()
                 ),
+            ),
+            widgetTextStyle = TextStyle(
+                color = DayNightColorProvider(
+                    LightColorPalette.onSurface,
+                    NightColorPalette.onSurface
+                )
             ),
             themeColorProvider = LightColorPalette.toColorProviders(),
             onClick = {}

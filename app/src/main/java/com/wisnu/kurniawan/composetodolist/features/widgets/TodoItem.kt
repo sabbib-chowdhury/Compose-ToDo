@@ -1,10 +1,9 @@
 package com.wisnu.kurniawan.composetodolist.features.widgets
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.glance.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
@@ -39,8 +38,6 @@ import androidx.glance.text.FontWeight as GlanceFontWeight
 fun TodoItem(
     task: ToDoTask,
     todoColor: ToDoColor,
-    widgetTextStyle: TextStyle,
-    context: Context = LocalContext.current,
     onClick: (ToDoTask) -> Unit,
 ) {
     Column(
@@ -84,7 +81,7 @@ fun TodoItem(
                         color = GlanceTheme.colors.onSurface
                     )
                 )
-                task.itemInfoDisplayable(context.resources, MaterialTheme.colorScheme.error)?.let { info ->
+                task.itemInfoDisplayable(LocalContext.current.resources, MaterialTheme.colorScheme.error)?.let { info ->
                     Spacer(GlanceModifier.height(4.dp))
                     Text(
                         text = info.text,
@@ -93,7 +90,7 @@ fun TodoItem(
                             fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             fontWeight = GlanceFontWeight.Medium,
                             color = FixedColorProvider(
-                                GlanceTheme.colors.onSurface.getColor(context)
+                                GlanceTheme.colors.onSurface.getColor(LocalContext.current)
                                     .copy(alpha = AlphaMedium)
                             )
                         )
@@ -107,7 +104,9 @@ fun TodoItem(
                 .fillMaxWidth()
                 .padding(1.dp)
                 .background(
-                    GlanceTheme.colors.onSurface.getColor(context).copy(alpha = DividerAlpha)
+                    GlanceTheme.colors.onSurface
+                        .getColor(LocalContext.current)
+                        .copy(alpha = DividerAlpha)
                 )
         )
     }
