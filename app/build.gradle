@@ -246,6 +246,7 @@ dependencies {
 
 
     implementation libs.androidx.glance.widgets
+    implementation libs.androidx.glance.material
     ///////////////
     // UNIT TEST SUPPORT
     //////
