@@ -17,16 +17,15 @@ import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.color.ColorProviders
 import androidx.glance.color.DayNightColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
-import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
@@ -39,8 +38,7 @@ import androidx.glance.text.TextStyle
 import com.wisnu.kurniawan.composetodolist.R
 import com.wisnu.kurniawan.composetodolist.features.widgets.domain.AllListWidgetInteractor
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.isDarkMode
-import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toColorProviders
-import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toColorScheme
+import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toGlanceColorProviders
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
 import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaMedium
 import com.wisnu.kurniawan.composetodolist.foundation.theme.LightColorPalette
@@ -77,20 +75,22 @@ class TodoListWidget : GlanceAppWidget() {
             val coroutineScope = rememberCoroutineScope()
             val todoLists by interactor.allLists.collectAsState(emptyList())
             val hostEnvironmentState by interactor.themes.collectAsState(Theme.SYSTEM)
-            val themeColors = hostEnvironmentState.toColorScheme(context).toColorProviders()
+            val themeColors = hostEnvironmentState.toGlanceColorProviders()
             Log.d(
                 "LOG_TAG---",
                 "TodoListWidget-provideGlance#65: ${context.isDarkMode} ${themeColors.background}"
             )
             GlanceTheme(themeColors) {
-                TodoWidget(
-                    context.getString(R.string.todo_all),
-                    todoLists,
-                    themeColors,
-                    widgetTextStyle = widgetTextStyle,
+                Scaffold(
+                    titleBar = { AllListTitleBar() }
                 ) {
-                    coroutineScope.launch {
-                        interactor.toggleTaskStatus(it)
+                    TodoWidget(
+                        todoLists,
+                        widgetTextStyle = widgetTextStyle,
+                    ) {
+                        coroutineScope.launch {
+                            interactor.toggleTaskStatus(it)
+                        }
                     }
                 }
             }
@@ -101,37 +101,21 @@ class TodoListWidget : GlanceAppWidget() {
 
 @Composable
 fun TodoWidget(
-    toDoListName: String,
     toDoLists: List<ToDoList> = emptyList(),
-    themeColorProvider: ColorProviders,
     widgetTextStyle: TextStyle = TextStyle(),
     onClick: (ToDoTask) -> Unit,
 ) {
-    Column(
-        modifier = GlanceModifier.fillMaxSize()
-            .padding(8.dp)
-            .background(themeColorProvider.surface),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = toDoListName,
-            style = widgetTextStyle.copy(color = themeColorProvider.onSurface),
-            modifier = GlanceModifier.padding(bottom = 8.dp),
-        )
-        TodoList(toDoLists, themeColorProvider, widgetTextStyle, onClick)
-    }
+    TodoList(toDoLists, widgetTextStyle, onClick)
 }
 
 @Composable
 private fun TodoList(
     toDoLists: List<ToDoList>,
-    themeColorProvider: ColorProviders,
     widgetTextStyle: TextStyle,
     onClick: (ToDoTask) -> Unit,
 ) {
     LazyColumn(
         modifier = GlanceModifier.fillMaxSize()
-            .background(themeColorProvider.secondaryContainer)
     ) {
         toDoLists.forEach { todo ->
             item {
@@ -187,7 +171,6 @@ private fun TodoList(
 private fun TodoWidgetPreview() {
     GlanceTheme {
         TodoWidget(
-            toDoListName = "Todo",
             toDoLists = listOf(
                 ToDoList(
                     id = "Work",
@@ -212,7 +195,6 @@ private fun TodoWidgetPreview() {
                     NightColorPalette.onSurface
                 )
             ),
-            themeColorProvider = LightColorPalette.toColorProviders(),
             onClick = {}
         )
     }
