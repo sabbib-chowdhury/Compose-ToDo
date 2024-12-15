@@ -42,7 +42,6 @@ fun TodoItem(
 ) {
     Column(
         modifier = GlanceModifier
-            .background(GlanceTheme.colors.secondaryContainer)
             .clickable { onClick(task) }
     ) {
         Row(

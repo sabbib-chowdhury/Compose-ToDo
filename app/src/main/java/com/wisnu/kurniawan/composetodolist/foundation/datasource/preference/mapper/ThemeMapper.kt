@@ -4,11 +4,10 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RestrictTo
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.glance.LocalContext as GlanceLocalContext
 import androidx.glance.color.ColorProviders
 import androidx.glance.material3.ColorProviders
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.model.ThemePreference
@@ -41,39 +40,38 @@ fun ThemePreference.toTheme() = when (this) {
 }
 
 @Composable
-fun Theme.toColorScheme(context: Context) = when(this) {
-    Theme.SYSTEM -> {
-        if (context.isDarkMode) {
-            NightColorPalette
-        } else {
-            LightColorPalette
-        }
-    }
-    Theme.WALLPAPER -> {
-        if (context.isDarkMode) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                dynamicDarkColorScheme(LocalContext.current)
-            } else {
+fun Theme.toGlanceColorProviders(): ColorProviders {
+    val themeColors = when(this) {
+        Theme.SYSTEM -> {
+            if (GlanceLocalContext.current.isDarkMode) {
                 NightColorPalette
-            }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                dynamicLightColorScheme(LocalContext.current)
             } else {
                 LightColorPalette
             }
         }
+        Theme.WALLPAPER -> {
+            if (GlanceLocalContext.current.isDarkMode) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    dynamicDarkColorScheme(GlanceLocalContext.current)
+                } else {
+                    NightColorPalette
+                }
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    dynamicLightColorScheme(GlanceLocalContext.current)
+                } else {
+                    LightColorPalette
+                }
+            }
+        }
+        Theme.LIGHT -> LightColorPalette
+        Theme.TWILIGHT -> TwilightColorPalette
+        Theme.NIGHT -> NightColorPalette
+        Theme.SUNRISE -> SunriseColorPalette
+        Theme.AURORA -> AuroraColorPalette
     }
-    Theme.LIGHT -> LightColorPalette
-    Theme.TWILIGHT -> TwilightColorPalette
-    Theme.NIGHT -> NightColorPalette
-    Theme.SUNRISE -> SunriseColorPalette
-    Theme.AURORA -> AuroraColorPalette
+    return ColorProviders(themeColors)
 }
-
-@Composable
-fun ColorScheme.toColorProviders(): ColorProviders =
-    ColorProviders(LightColorPalette, NightColorPalette)
 
 val Context.isDarkMode: Boolean
     @RestrictTo(RestrictTo.Scope.LIBRARY)
