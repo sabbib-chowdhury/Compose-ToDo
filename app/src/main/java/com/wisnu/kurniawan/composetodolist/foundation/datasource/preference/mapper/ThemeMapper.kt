@@ -10,8 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.glance.color.ColorProviders
-import androidx.glance.color.colorProviders
-import androidx.glance.unit.ColorProvider
+import androidx.glance.material3.ColorProviders
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.model.ThemePreference
 import com.wisnu.kurniawan.composetodolist.foundation.theme.AuroraColorPalette
 import com.wisnu.kurniawan.composetodolist.foundation.theme.LightColorPalette
@@ -73,65 +72,8 @@ fun Theme.toColorScheme(context: Context) = when(this) {
 }
 
 @Composable
-fun ColorScheme.toColorProviders(context: Context): ColorProviders = if (context.isDarkMode) {
-    colorProviders(
-        primary = ColorProvider(NightColorPalette.primary),
-        onPrimary = ColorProvider(NightColorPalette.onPrimary),
-        primaryContainer = ColorProvider(NightColorPalette.primaryContainer),
-        onPrimaryContainer = ColorProvider(NightColorPalette.onPrimaryContainer),
-        secondary = ColorProvider(NightColorPalette.secondary),
-        onSecondary = ColorProvider(NightColorPalette.onSecondary),
-        secondaryContainer = ColorProvider(NightColorPalette.secondaryContainer),
-        onSecondaryContainer = ColorProvider(NightColorPalette.onSecondaryContainer),
-        tertiary = ColorProvider(NightColorPalette.tertiary),
-        onTertiary = ColorProvider(NightColorPalette.onTertiary),
-        tertiaryContainer = ColorProvider(NightColorPalette.tertiaryContainer),
-        onTertiaryContainer = ColorProvider(NightColorPalette.onTertiaryContainer),
-        error = ColorProvider(NightColorPalette.error),
-        errorContainer = ColorProvider(NightColorPalette.errorContainer),
-        onError = ColorProvider(NightColorPalette.onError),
-        onErrorContainer = ColorProvider(NightColorPalette.onErrorContainer),
-        background = ColorProvider(NightColorPalette.background),
-        onBackground = ColorProvider(NightColorPalette.onBackground),
-        surface = ColorProvider(NightColorPalette.surface),
-        onSurface = ColorProvider(NightColorPalette.onSurface),
-        surfaceVariant = ColorProvider(NightColorPalette.surfaceVariant),
-        onSurfaceVariant = ColorProvider(NightColorPalette.onSurfaceVariant),
-        outline = ColorProvider(NightColorPalette.outline),
-        inverseOnSurface = ColorProvider(NightColorPalette.inverseOnSurface),
-        inverseSurface = ColorProvider(NightColorPalette.inverseSurface),
-        inversePrimary = ColorProvider(NightColorPalette.inversePrimary),
-    )
-} else {
-    colorProviders(
-        primary = ColorProvider(LightColorPalette.primary),
-        onPrimary = ColorProvider(LightColorPalette.onPrimary),
-        primaryContainer = ColorProvider(LightColorPalette.primaryContainer),
-        onPrimaryContainer = ColorProvider(LightColorPalette.onPrimaryContainer),
-        secondary = ColorProvider(LightColorPalette.secondary),
-        onSecondary = ColorProvider(LightColorPalette.onSecondary),
-        secondaryContainer = ColorProvider(LightColorPalette.secondaryContainer),
-        onSecondaryContainer = ColorProvider(LightColorPalette.onSecondaryContainer),
-        tertiary = ColorProvider(LightColorPalette.tertiary),
-        onTertiary = ColorProvider(LightColorPalette.onTertiary),
-        tertiaryContainer = ColorProvider(LightColorPalette.tertiaryContainer),
-        onTertiaryContainer = ColorProvider(LightColorPalette.onTertiaryContainer),
-        error = ColorProvider(LightColorPalette.error),
-        errorContainer = ColorProvider(LightColorPalette.errorContainer),
-        onError = ColorProvider(LightColorPalette.onError),
-        onErrorContainer = ColorProvider(LightColorPalette.onErrorContainer),
-        background = ColorProvider(LightColorPalette.background),
-        onBackground = ColorProvider(LightColorPalette.onBackground),
-        surface = ColorProvider(LightColorPalette.surface),
-        onSurface = ColorProvider(LightColorPalette.onSurface),
-        surfaceVariant = ColorProvider(LightColorPalette.surfaceVariant),
-        onSurfaceVariant = ColorProvider(LightColorPalette.onSurfaceVariant),
-        outline = ColorProvider(LightColorPalette.outline),
-        inverseOnSurface = ColorProvider(LightColorPalette.inverseOnSurface),
-        inverseSurface = ColorProvider(LightColorPalette.inverseSurface),
-        inversePrimary = ColorProvider(LightColorPalette.inversePrimary),
-    )
-}
+fun ColorScheme.toColorProviders(): ColorProviders =
+    ColorProviders(LightColorPalette, NightColorPalette)
 
 val Context.isDarkMode: Boolean
     @RestrictTo(RestrictTo.Scope.LIBRARY)
