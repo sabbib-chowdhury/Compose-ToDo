@@ -1,7 +1,6 @@
 package com.wisnu.kurniawan.composetodolist.features.widgets.domain
 
 import android.content.Context
-import android.util.Log
 import androidx.glance.appwidget.updateAll
 import com.wisnu.kurniawan.composetodolist.features.host.data.HostEnvironment
 import com.wisnu.kurniawan.composetodolist.features.todo.all.data.AllEnvironment
@@ -34,7 +33,6 @@ class AllListWidgetInteractor @Inject constructor(
         get() {
             return hostEnvironment.getTheme()
                 .onEach {
-                    Log.d("LOG_TAG---", "AllListWidgetInteractor-#34: $it")
                     TodoListWidget().updateAll(context)
                 }
         }

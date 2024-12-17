@@ -268,6 +268,18 @@ sealed class SearchFlow(val name: String) {
     }
 }
 
+sealed class WidgetSettings(val name: String) {
+    data object Root : WidgetSettings("widget-settings-root") {
+        val route = name
+    }
+
+    data object WidgetSettingsScreen : WidgetSettings("widget-settings-screen") {
+        val route = name
+        const val actionKeySuffix = ".WidgetSettings"
+        const val actionValue = "settings"
+    }
+}
+
 const val BASE_DEEPLINK = "remindee://com.wisnu.kurniawan"
 
 const val ARG_STEP_ID = "stepId"
