@@ -5,6 +5,7 @@ import androidx.glance.appwidget.updateAll
 import com.wisnu.kurniawan.composetodolist.features.host.data.HostEnvironment
 import com.wisnu.kurniawan.composetodolist.features.todo.all.data.AllEnvironment
 import com.wisnu.kurniawan.composetodolist.features.widgets.TodoListWidget
+import com.wisnu.kurniawan.composetodolist.features.widgets.data.AllListWidgetRepository
 import com.wisnu.kurniawan.composetodolist.model.Theme
 import com.wisnu.kurniawan.composetodolist.model.ToDoTask
 import dagger.hilt.EntryPoint
@@ -27,6 +28,7 @@ class AllListWidgetInteractor @Inject constructor(
     @ApplicationContext private val context: Context,
     private val allEnvironment: AllEnvironment,
     private val hostEnvironment: HostEnvironment,
+    private val allListWidgetRepository: AllListWidgetRepository
 ) {
     val allLists = allEnvironment.getList()
     val themes: Flow<Theme>
@@ -39,6 +41,15 @@ class AllListWidgetInteractor @Inject constructor(
 
     internal suspend fun toggleTaskStatus(task: ToDoTask) {
         allEnvironment.toggleTaskStatus(task)
+        TodoListWidget().updateAll(context)
+    }
+
+    fun fetchWidgetSettings(): Flow<Boolean> {
+        return allListWidgetRepository.getWidgetSettings()
+    }
+
+    suspend fun setWidgetSettings(showCompletedTasks: Boolean) {
+        allListWidgetRepository.setWidgetSettings(showCompletedTasks)
         TodoListWidget().updateAll(context)
     }
 

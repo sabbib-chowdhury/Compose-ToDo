@@ -11,6 +11,8 @@ import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mode
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.model.UserLanguagePreference
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.model.UserPreference
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.model.UserThemePreference
+import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.model.UserWidgetSettingsPreference
+import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.serializer.WidgetSettingsPreferenceSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,6 +24,7 @@ private const val CREDENTIAL_NAME = "credential-preference.pb"
 private const val USER_NAME = "user-preference.pb"
 private const val THEME_NAME = "theme-preference.pb"
 private const val LANGUAGE_NAME = "language-preference.pb"
+private const val WIDGET_SETTINGS_NAME = "widget-settings.pb"
 
 private val Context.credentialDataStore: DataStore<CredentialPreference> by dataStore(
     fileName = CREDENTIAL_NAME,
@@ -38,6 +41,11 @@ private val Context.themeDataStore: DataStore<UserThemePreference> by dataStore(
 val Context.languageDatastore: DataStore<UserLanguagePreference> by dataStore(
     fileName = LANGUAGE_NAME,
     serializer = LanguagePreferenceSerializer
+)
+
+val Context.widgetSettingsDatastore: DataStore<UserWidgetSettingsPreference> by dataStore(
+    fileName = WIDGET_SETTINGS_NAME,
+    serializer = WidgetSettingsPreferenceSerializer
 )
 
 @Module
@@ -66,6 +74,12 @@ object DataStoreModule {
     @Provides
     fun provideLanguageDataStore(@ApplicationContext context: Context): DataStore<UserLanguagePreference> {
         return context.languageDatastore
+    }
+
+    @Singleton
+    @Provides
+    fun provideWidgetSettingsDataStore(@ApplicationContext context: Context): DataStore<UserWidgetSettingsPreference> {
+        return context.widgetSettingsDatastore
     }
 
 }
