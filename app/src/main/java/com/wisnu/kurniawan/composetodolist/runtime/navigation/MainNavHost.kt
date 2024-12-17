@@ -1,5 +1,6 @@
 package com.wisnu.kurniawan.composetodolist.runtime.navigation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material.navigation.BottomSheetNavigator
 import androidx.compose.material.navigation.ModalBottomSheetLayout
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,13 +29,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.wisnu.kurniawan.composetodolist.features.splash.ui.SplashScreen
 import com.wisnu.kurniawan.composetodolist.features.splash.ui.SplashViewModel
+import com.wisnu.kurniawan.composetodolist.features.widgets.settings.WidgetSettingsNavHost
 import com.wisnu.kurniawan.composetodolist.foundation.uiextension.rememberBottomSheetNavigator
 import com.wisnu.kurniawan.composetodolist.foundation.window.WindowState
+import com.wisnu.kurniawan.composetodolist.model.AppEntryPoint
 
 const val MinLargeScreenWidth = 585
 
 @Composable
-fun MainNavHost(windowState: WindowState) {
+fun MainNavHost(windowState: WindowState, entryPoint: AppEntryPoint? = null) {
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val bottomSheetConfig = remember { mutableStateOf(DefaultMainBottomSheetConfig) }
 
@@ -53,7 +57,7 @@ fun MainNavHost(windowState: WindowState) {
         if (isLargeScreen) {
             LargeScreenNavHost(bottomSheetNavigator, windowState, bottomSheetConfig)
         } else {
-            SmallScreenNavHost(bottomSheetNavigator, bottomSheetConfig)
+            SmallScreenNavHost(bottomSheetNavigator, bottomSheetConfig, entryPoint)
         }
     }
 }
@@ -62,7 +66,7 @@ fun MainNavHost(windowState: WindowState) {
 private fun LargeScreenNavHost(
     bottomSheetNavigator: BottomSheetNavigator,
     windowState: WindowState,
-    bottomSheetConfig: MutableState<MainBottomSheetConfig>
+    bottomSheetConfig: MutableState<MainBottomSheetConfig>,
 ) {
     val navController = rememberNavController(bottomSheetNavigator)
 
@@ -86,13 +90,15 @@ private fun LargeScreenNavHost(
                 HomeTabletNavHost(navController, 0.333F, 0.666F)
             }
         }
+        WidgetSettingsNavHost(navController)
     }
 }
 
 @Composable
 private fun SmallScreenNavHost(
     bottomSheetNavigator: BottomSheetNavigator,
-    bottomSheetConfig: MutableState<MainBottomSheetConfig>
+    bottomSheetConfig: MutableState<MainBottomSheetConfig>,
+    entryPoint: AppEntryPoint? = null,
 ) {
     val navController = rememberNavController(bottomSheetNavigator)
     NavHost(
@@ -119,6 +125,13 @@ private fun SmallScreenNavHost(
         ScheduledTodayNavHost(navController, Icons.Rounded.ChevronLeft)
 
         AllNavHost(navController, Icons.Rounded.ChevronLeft)
+        WidgetSettingsNavHost(navController)
+    }
+    LaunchedEffect(entryPoint) {
+        entryPoint?.let {
+            Log.d("LOG_TAG---", "-SmallScreenNavHost#132: $it")
+            navController.navigate(it.route)
+        }
     }
 }
 
@@ -189,7 +202,11 @@ private fun HomeTabletNavHost(
 
                     }
 
-                    ListDetailNavHost(navControllerRight, bottomSheetConfigRight, Icons.Rounded.Close)
+                    ListDetailNavHost(
+                        navControllerRight,
+                        bottomSheetConfigRight,
+                        Icons.Rounded.Close
+                    )
 
                     StepNavHost(navControllerRight, bottomSheetConfigRight)
 
