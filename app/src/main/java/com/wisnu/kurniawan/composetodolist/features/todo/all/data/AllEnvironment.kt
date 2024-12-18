@@ -9,7 +9,6 @@ import com.wisnu.kurniawan.composetodolist.foundation.extension.toggleStatusHand
 import com.wisnu.kurniawan.composetodolist.foundation.wrapper.DateTimeProvider
 import com.wisnu.kurniawan.composetodolist.model.ToDoList
 import com.wisnu.kurniawan.composetodolist.model.ToDoTask
-import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

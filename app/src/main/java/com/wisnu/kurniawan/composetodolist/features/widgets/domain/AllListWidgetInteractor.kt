@@ -7,6 +7,7 @@ import com.wisnu.kurniawan.composetodolist.features.todo.all.data.AllEnvironment
 import com.wisnu.kurniawan.composetodolist.features.widgets.TodoListWidget
 import com.wisnu.kurniawan.composetodolist.features.widgets.data.AllListWidgetRepository
 import com.wisnu.kurniawan.composetodolist.model.Theme
+import com.wisnu.kurniawan.composetodolist.model.ToDoStatus
 import com.wisnu.kurniawan.composetodolist.model.ToDoTask
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -14,6 +15,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -28,9 +30,24 @@ class AllListWidgetInteractor @Inject constructor(
     @ApplicationContext private val context: Context,
     private val allEnvironment: AllEnvironment,
     private val hostEnvironment: HostEnvironment,
-    private val allListWidgetRepository: AllListWidgetRepository
+    private val allListWidgetRepository: AllListWidgetRepository,
 ) {
-    val allLists = allEnvironment.getList()
+
+    val allLists = combine(
+        allEnvironment.getList(),
+        allListWidgetRepository.getWidgetSettings()
+    ) { todoLists, showCompletedTasks ->
+        if (showCompletedTasks) {
+            todoLists.map {
+                it.copy(tasks = it.tasks.sortedBy { task -> task.status })
+            }
+        } else {
+            todoLists.map {
+                it.copy(tasks = it.tasks.filter { task -> task.status == ToDoStatus.IN_PROGRESS })
+            }
+        }
+    }
+
     val themes: Flow<Theme>
         get() {
             return hostEnvironment.getTheme()

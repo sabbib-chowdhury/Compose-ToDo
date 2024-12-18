@@ -50,7 +50,6 @@ fun NavGraphBuilder.WidgetSettingsNavHost(
             Scaffold(
                 topBar = { WidgetSettingsTopBar { navHostController.popBackStack() } }
             ) { contentPadding ->
-                Log.d("LOG_TAG---", "-WidgetSettingsNavHost#46: $a $contentPadding")
                 WidgetSettingsContent(
                     contentPadding,
                     uiState,

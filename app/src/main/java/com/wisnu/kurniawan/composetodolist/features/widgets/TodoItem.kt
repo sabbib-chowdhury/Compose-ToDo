@@ -20,9 +20,9 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
+import androidx.glance.text.TextDecoration
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import androidx.glance.unit.FixedColorProvider
 import com.wisnu.kurniawan.composetodolist.R
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
 import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaDisabled
@@ -51,17 +51,40 @@ fun TodoItem(
                 .height(68.dp)
         ) {
 
-            val (image, color) = if (task.status == ToDoStatus.IN_PROGRESS) {
-                R.drawable.ic_widget_round_radio_button_unchecked to ColorProvider(todoColor.toColor())
+            val (image, colorTint, textDecoration) = if (task.status == ToDoStatus.IN_PROGRESS) {
+                Triple(
+                    R.drawable.ic_widget_round_radio_button_unchecked,
+                    ColorProvider(todoColor.toColor()),
+                    TextDecoration.None
+                )
             } else {
-                R.drawable.ic_widget_round_check_circle to ColorProvider(
-                    todoColor.toColor().copy(alpha = AlphaDisabled)
+                Triple(
+                    R.drawable.ic_widget_round_check_circle,
+                    ColorProvider(
+                        todoColor.toColor().copy(alpha = AlphaDisabled)
+                    ),
+                    TextDecoration.LineThrough
+                )
+            }
+
+            val (taskTextColor, itemInfoTextColor) = if (task.status == ToDoStatus.IN_PROGRESS) {
+                GlanceTheme.colors.onSurface to ColorProvider(
+                    GlanceTheme.colors.onSurface.getColor(LocalContext.current)
+                        .copy(alpha = AlphaMedium)
+                )
+            } else {
+                ColorProvider(
+                    GlanceTheme.colors.onSurface.getColor(LocalContext.current)
+                        .copy(alpha = AlphaDisabled)
+                ) to ColorProvider(
+                    GlanceTheme.colors.onSurface.getColor(LocalContext.current)
+                        .copy(alpha = AlphaDisabled)
                 )
             }
             Image(
                 provider = ImageProvider(image),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(color),
+                colorFilter = ColorFilter.tint(colorTint),
                 modifier = GlanceModifier
                     .padding(end = 8.dp)
                     .clickable {
@@ -77,7 +100,8 @@ fun TodoItem(
                     style = TextStyle(
                         fontSize = MaterialTheme.typography.titleSmall.fontSize,
                         fontWeight = GlanceFontWeight.Medium,
-                        color = GlanceTheme.colors.onSurface
+                        color = taskTextColor,
+                        textDecoration = textDecoration
                     )
                 )
                 task.itemInfoDisplayable(LocalContext.current.resources, MaterialTheme.colorScheme.error)?.let { info ->
@@ -88,10 +112,7 @@ fun TodoItem(
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             fontWeight = GlanceFontWeight.Medium,
-                            color = FixedColorProvider(
-                                GlanceTheme.colors.onSurface.getColor(LocalContext.current)
-                                    .copy(alpha = AlphaMedium)
-                            )
+                            color = itemInfoTextColor
                         )
                     )
                 }
