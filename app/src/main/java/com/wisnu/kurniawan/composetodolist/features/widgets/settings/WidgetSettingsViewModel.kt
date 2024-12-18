@@ -6,42 +6,44 @@ import com.wisnu.kurniawan.composetodolist.features.widgets.domain.AllListWidget
 import com.wisnu.kurniawan.composetodolist.features.widgets.settings.model.WidgetSettingsUiContract
 import com.wisnu.kurniawan.composetodolist.features.widgets.settings.model.WidgetSettingsUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class WidgetSettingsViewModel @Inject constructor(
-    private val allListWidgetInteractor: AllListWidgetInteractor
-) : ViewModel()   {
+    private val allListWidgetInteractor: AllListWidgetInteractor,
+) : ViewModel() {
 
-    private val mutableUiState = MutableStateFlow(
-        WidgetSettingsUiContract.ViewState(
-            listOf(
-                WidgetSettingsUiModel.SelectableSetting(
-                    "Show Completed Tasks", false
-                )
+    private val initialValue = WidgetSettingsUiContract.ViewState(
+        data = listOf(
+            WidgetSettingsUiModel.SelectableSetting(
+                title = "Show Completed Tasks",
+                isSelected = false
             )
         )
     )
+    private val mutableUiState = MutableStateFlow(initialValue)
     val uiState = mutableUiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            allListWidgetInteractor.fetchWidgetSettings().collect {
+                mutableUiState.value = initialValue.copy(
+                    data = initialValue.data.map { uiState ->
+                        when (uiState) {
+                            is WidgetSettingsUiModel.SelectableSetting -> uiState.copy(isSelected = it)
+                        }
+                    }
+                )
+            }
+        }
+    }
 
     fun onItemSelectionToggled(item: WidgetSettingsUiModel.SelectableSetting) {
         viewModelScope.launch {
             allListWidgetInteractor.setWidgetSettings(!item.isSelected)
-        }
-        mutableUiState.update { currentState ->
-            currentState.copy(
-                data = currentState.data.map {
-                    if (it is WidgetSettingsUiModel.SelectableSetting && it.title == item.title) {
-                        it.copy(isSelected = !it.isSelected)
-                    } else {
-                        it
-                    }
-                }
-            )
         }
     }
 }

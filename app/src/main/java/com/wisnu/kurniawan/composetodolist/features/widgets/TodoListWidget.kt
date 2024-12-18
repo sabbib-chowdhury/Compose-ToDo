@@ -74,7 +74,6 @@ class TodoListWidget : GlanceAppWidget() {
         provideContent {
             val coroutineScope = rememberCoroutineScope()
             val todoLists by interactor.allLists.collectAsState(emptyList())
-            val isCompletedSettingsVisible by interactor.fetchWidgetSettings().collectAsState(false)
             val hostEnvironmentState by interactor.themes.collectAsState(Theme.SYSTEM)
             val themeColors = hostEnvironmentState.toGlanceColorProviders()
             Log.d(
@@ -87,7 +86,6 @@ class TodoListWidget : GlanceAppWidget() {
                 ) {
                     TodoWidget(
                         todoLists,
-                        isCompletedSettingsVisible,
                         widgetTextStyle = widgetTextStyle,
                     ) {
                         coroutineScope.launch {
@@ -104,17 +102,15 @@ class TodoListWidget : GlanceAppWidget() {
 @Composable
 fun TodoWidget(
     toDoLists: List<ToDoList> = emptyList(),
-    isCompletedSettingsVisible: Boolean,
     widgetTextStyle: TextStyle = TextStyle(),
     onClick: (ToDoTask) -> Unit,
 ) {
-    TodoList(toDoLists, isCompletedSettingsVisible, widgetTextStyle, onClick)
+    TodoList(toDoLists, widgetTextStyle, onClick)
 }
 
 @Composable
 private fun TodoList(
     toDoLists: List<ToDoList>,
-    isCompletedTaskVisible: Boolean,
     widgetTextStyle: TextStyle,
     onClick: (ToDoTask) -> Unit,
 ) {
@@ -163,14 +159,7 @@ private fun TodoList(
                 }
             }
             items(todo.tasks) { item ->
-                if (isCompletedTaskVisible) {
-                    TodoItem(item, todo.color, onClick)
-                } else {
-                    if (item.status == ToDoStatus.IN_PROGRESS) {
-                        TodoItem(item, todo.color, onClick)
-                    }
-                }
-
+                TodoItem(item, todo.color, onClick)
             }
         }
     }
@@ -199,7 +188,6 @@ private fun TodoWidgetPreview() {
                     updatedAt = LocalDateTime.now()
                 ),
             ),
-            isCompletedSettingsVisible = true,
             widgetTextStyle = TextStyle(
                 color = DayNightColorProvider(
                     LightColorPalette.onSurface,
