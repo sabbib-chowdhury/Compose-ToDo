@@ -31,10 +31,10 @@ fun AllListTitleBar(modifier: GlanceModifier = GlanceModifier) {
         ).apply {
             putExtra(
                 "$packageName${WidgetSettings.WidgetSettingsScreen.actionKeySuffix}",
-                WidgetSettings.WidgetSettingsScreen.actionValue,
+                WidgetSettings.WidgetSettingsScreen.route,
             )
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            action = WidgetSettings.WidgetSettingsScreen.actionValue
+            action = WidgetSettings.WidgetSettingsScreen.route
         }
         Image(
             modifier = modifier
