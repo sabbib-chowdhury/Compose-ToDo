@@ -41,12 +41,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             null
         }
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(700)
-            TodoListWidget().updateAll(this@MainActivity)
-            if (appEntryPoint == null)
-                finish()
-        }
 
         setContent {
             windowState = rememberWindowState()
