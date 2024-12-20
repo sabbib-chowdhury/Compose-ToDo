@@ -143,53 +143,7 @@ private fun TodoList(
     ) {
         toDoLists.forEach { todo ->
             item {
-                Row(
-                    modifier = GlanceModifier
-                        .background(todo.color.toColor().copy(alpha = AlphaMedium))
-                        .cornerRadius(4.dp)
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp, horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = GlanceModifier
-                            .size(36.dp)
-                            .cornerRadius(18.dp)
-                            .background(todo.color.toColor())
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            modifier = GlanceModifier
-                                .size(36.dp)
-                                .padding(vertical = 8.dp, horizontal = 8.dp),
-                            provider = ImageProvider(R.drawable.ic_widget_more_horiz),
-                            contentDescription = todo.name
-                        )
-                    }
-                    val titleSmall = MaterialTheme.typography.titleSmall
-                    Text(
-                        modifier = GlanceModifier
-                            .wrapContentWidth()
-                            .padding(8.dp),
-                        text = todo.name,
-                        style = TextStyle(
-                            color = widgetTextStyle.color,
-                            fontSize = titleSmall.fontSize,
-                            fontWeight = FontWeight.Bold,
-                            fontStyle = FontStyle.Normal,
-                        )
-                    )
-                    Spacer(modifier = GlanceModifier.defaultWeight())
-                    Image(
-                        modifier = GlanceModifier
-                            .size(36.dp)
-                            .padding(horizontal = 4.dp)
-                            .clickable(onAddTaskClick(todo)),
-                        provider = ImageProvider(R.drawable.ic_add_circle_outline),
-                        contentDescription = "add task",
-                    )
-                }
+                TodoListHeader(todo, widgetTextStyle, onAddTaskClick)
             }
             items(todo.tasks) { item ->
                 TodoItem(item, todo.color, onClick)
