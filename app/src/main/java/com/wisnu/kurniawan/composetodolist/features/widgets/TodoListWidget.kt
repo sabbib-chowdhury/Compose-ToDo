@@ -2,7 +2,6 @@ package com.wisnu.kurniawan.composetodolist.features.widgets
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -13,38 +12,19 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
-import androidx.glance.Image
-import androidx.glance.ImageProvider
 import androidx.glance.action.Action
-import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.components.Scaffold
-import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
-import androidx.glance.background
 import androidx.glance.color.DayNightColorProvider
-import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
-import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.padding
-import androidx.glance.layout.size
-import androidx.glance.layout.wrapContentWidth
-import androidx.glance.text.FontStyle
-import androidx.glance.text.FontWeight
-import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.wisnu.kurniawan.composetodolist.R
 import com.wisnu.kurniawan.composetodolist.features.widgets.domain.AllListWidgetInteractor
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toGlanceColorProviders
-import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
-import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaMedium
 import com.wisnu.kurniawan.composetodolist.foundation.theme.LightColorPalette
 import com.wisnu.kurniawan.composetodolist.foundation.theme.NightColorPalette
 import com.wisnu.kurniawan.composetodolist.model.Theme
@@ -89,8 +69,7 @@ class TodoListWidget : GlanceAppWidget() {
 
                     fun createMainActivityIntent(context: Context, routeId: String): Intent {
                         val packageName = context.packageName
-                        val mainActivityIntent =
-                            Intent(context, MainActivity::class.java)
+                        val mainActivityIntent = Intent(context, MainActivity::class.java)
                         mainActivityIntent.apply {
                             putExtra(
                                 "$packageName${WidgetSettings.WidgetSettingsScreen.actionKeySuffix}",
