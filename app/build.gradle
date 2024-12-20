@@ -256,6 +256,9 @@ dependencies {
     testImplementation libs.test.junit
     testImplementation libs.test.coroutines
     testImplementation libs.test.turbine
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent)
+    testImplementation(libs.mockk.android)
 }
 
 
