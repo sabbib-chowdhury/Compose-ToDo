@@ -1,7 +1,7 @@
 package com.wisnu.kurniawan.composetodolist.features.widgets
 
 import android.content.Context
-import android.util.Log
+import android.content.Intent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -15,8 +15,11 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.Action
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
@@ -27,17 +30,18 @@ import androidx.glance.color.DayNightColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
+import androidx.glance.layout.wrapContentWidth
 import androidx.glance.text.FontStyle
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.wisnu.kurniawan.composetodolist.R
 import com.wisnu.kurniawan.composetodolist.features.widgets.domain.AllListWidgetInteractor
-import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.isDarkMode
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toGlanceColorProviders
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
 import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaMedium
@@ -48,6 +52,9 @@ import com.wisnu.kurniawan.composetodolist.model.ToDoColor
 import com.wisnu.kurniawan.composetodolist.model.ToDoList
 import com.wisnu.kurniawan.composetodolist.model.ToDoStatus
 import com.wisnu.kurniawan.composetodolist.model.ToDoTask
+import com.wisnu.kurniawan.composetodolist.runtime.MainActivity
+import com.wisnu.kurniawan.composetodolist.runtime.navigation.ListDetailFlow
+import com.wisnu.kurniawan.composetodolist.runtime.navigation.WidgetSettings
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -68,7 +75,6 @@ class TodoListWidget : GlanceAppWidget() {
     )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        Log.d("LOG_TAG---", "TodoListWidget-provideGlance#46: ")
         val interactor = AllListWidgetInteractor.get(context)
 
         provideContent {
@@ -76,22 +82,38 @@ class TodoListWidget : GlanceAppWidget() {
             val todoLists by interactor.allLists.collectAsState(emptyList())
             val hostEnvironmentState by interactor.themes.collectAsState(Theme.SYSTEM)
             val themeColors = hostEnvironmentState.toGlanceColorProviders()
-            Log.d(
-                "LOG_TAG---",
-                "TodoListWidget-provideGlance#65: ${context.isDarkMode} ${themeColors.background}"
-            )
             GlanceTheme(themeColors) {
                 Scaffold(
                     titleBar = { AllListTitleBar() }
                 ) {
+
+                    fun createMainActivityIntent(context: Context, routeId: String): Intent {
+                        val packageName = context.packageName
+                        val mainActivityIntent =
+                            Intent(context, MainActivity::class.java)
+                        mainActivityIntent.apply {
+                            putExtra(
+                                "$packageName${WidgetSettings.WidgetSettingsScreen.actionKeySuffix}",
+                                ListDetailFlow.Root.route(routeId),
+                            )
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            action = ListDetailFlow.Root.route(routeId)
+                        }
+                        return mainActivityIntent
+                    }
+
                     TodoWidget(
                         todoLists,
                         widgetTextStyle = widgetTextStyle,
-                    ) {
-                        coroutineScope.launch {
-                            interactor.toggleTaskStatus(it)
+                        onClick = {
+                            coroutineScope.launch {
+                                interactor.toggleTaskStatus(it)
+                            }
+                        },
+                        onAddTaskClick = { todoList ->
+                            actionStartActivity(createMainActivityIntent(context, todoList.id))
                         }
-                    }
+                    )
                 }
             }
         }
@@ -104,8 +126,9 @@ fun TodoWidget(
     toDoLists: List<ToDoList> = emptyList(),
     widgetTextStyle: TextStyle = TextStyle(),
     onClick: (ToDoTask) -> Unit,
+    onAddTaskClick: (ToDoList) -> Action,
 ) {
-    TodoList(toDoLists, widgetTextStyle, onClick)
+    TodoList(toDoLists, widgetTextStyle, onClick, onAddTaskClick)
 }
 
 @Composable
@@ -113,17 +136,18 @@ private fun TodoList(
     toDoLists: List<ToDoList>,
     widgetTextStyle: TextStyle,
     onClick: (ToDoTask) -> Unit,
+    onAddTaskClick: (ToDoList) -> Action,
 ) {
     LazyColumn(
         modifier = GlanceModifier.fillMaxSize()
     ) {
         toDoLists.forEach { todo ->
             item {
-                Log.d("LOG_TAG---", "TodoListWidget-TodoList#119: ${todo.name}")
                 Row(
                     modifier = GlanceModifier
                         .background(todo.color.toColor().copy(alpha = AlphaMedium))
                         .cornerRadius(4.dp)
+                        .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -146,7 +170,7 @@ private fun TodoList(
                     val titleSmall = MaterialTheme.typography.titleSmall
                     Text(
                         modifier = GlanceModifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                             .padding(8.dp),
                         text = todo.name,
                         style = TextStyle(
@@ -155,6 +179,15 @@ private fun TodoList(
                             fontWeight = FontWeight.Bold,
                             fontStyle = FontStyle.Normal,
                         )
+                    )
+                    Spacer(modifier = GlanceModifier.defaultWeight())
+                    Image(
+                        modifier = GlanceModifier
+                            .size(36.dp)
+                            .padding(horizontal = 4.dp)
+                            .clickable(onAddTaskClick(todo)),
+                        provider = ImageProvider(R.drawable.ic_add_circle_outline),
+                        contentDescription = "add task",
                     )
                 }
             }
@@ -194,7 +227,8 @@ private fun TodoWidgetPreview() {
                     NightColorPalette.onSurface
                 )
             ),
-            onClick = {}
+            onClick = {},
+            onAddTaskClick = { object : Action {} }
         )
     }
 }

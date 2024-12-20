@@ -276,7 +276,6 @@ sealed class WidgetSettings(val name: String) {
     data object WidgetSettingsScreen : WidgetSettings("widget-settings-screen") {
         val route = name
         const val actionKeySuffix = ".WidgetSettings"
-        const val actionValue = "settings"
     }
 }
 

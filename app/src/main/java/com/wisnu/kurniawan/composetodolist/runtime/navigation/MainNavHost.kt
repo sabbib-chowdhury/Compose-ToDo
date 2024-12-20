@@ -32,12 +32,11 @@ import com.wisnu.kurniawan.composetodolist.features.splash.ui.SplashViewModel
 import com.wisnu.kurniawan.composetodolist.features.widgets.settings.WidgetSettingsNavHost
 import com.wisnu.kurniawan.composetodolist.foundation.uiextension.rememberBottomSheetNavigator
 import com.wisnu.kurniawan.composetodolist.foundation.window.WindowState
-import com.wisnu.kurniawan.composetodolist.model.AppEntryPoint
 
 const val MinLargeScreenWidth = 585
 
 @Composable
-fun MainNavHost(windowState: WindowState, entryPoint: AppEntryPoint? = null) {
+fun MainNavHost(windowState: WindowState, entryPoint: Set<String>? = null) {
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val bottomSheetConfig = remember { mutableStateOf(DefaultMainBottomSheetConfig) }
 
@@ -98,7 +97,7 @@ private fun LargeScreenNavHost(
 private fun SmallScreenNavHost(
     bottomSheetNavigator: BottomSheetNavigator,
     bottomSheetConfig: MutableState<MainBottomSheetConfig>,
-    entryPoint: AppEntryPoint? = null,
+    entryPoint: Set<String>? = null,
 ) {
     val navController = rememberNavController(bottomSheetNavigator)
     NavHost(
@@ -128,9 +127,11 @@ private fun SmallScreenNavHost(
         WidgetSettingsNavHost(navController)
     }
     LaunchedEffect(entryPoint) {
-        entryPoint?.let {
-            Log.d("LOG_TAG---", "-SmallScreenNavHost#132: $it")
-            navController.navigate(it.route)
+        entryPoint?.let { entry ->
+            entry.forEach {
+                Log.d("LOG_TAG---", "-SmallScreenNavHost#132: $it")
+                navController.navigate(it)
+            }
         }
     }
 }
