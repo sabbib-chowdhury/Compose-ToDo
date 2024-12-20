@@ -1,6 +1,5 @@
 package com.wisnu.kurniawan.composetodolist.features.widgets
 
-import android.util.Log
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.glance.LocalContext
@@ -20,29 +19,27 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
-import androidx.glance.text.TextDecoration
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.wisnu.kurniawan.composetodolist.R
+import com.wisnu.kurniawan.composetodolist.features.widgets.model.TaskStatusUi
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
-import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaDisabled
-import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaMedium
 import com.wisnu.kurniawan.composetodolist.foundation.theme.DividerAlpha
 import com.wisnu.kurniawan.composetodolist.foundation.uicomponent.itemInfoDisplayable
 import com.wisnu.kurniawan.composetodolist.model.ToDoColor
-import com.wisnu.kurniawan.composetodolist.model.ToDoStatus
 import com.wisnu.kurniawan.composetodolist.model.ToDoTask
 import androidx.glance.text.FontWeight as GlanceFontWeight
 
 @Composable
 fun TodoItem(
-    task: ToDoTask,
+    taskName: String,
+    taskDetailInfo: ToDoTask,
+    taskStatusUi: TaskStatusUi,
     todoColor: ToDoColor,
     onClick: (ToDoTask) -> Unit,
 ) {
     Column(
         modifier = GlanceModifier
-            .clickable { onClick(task) }
+            .clickable { onClick(taskDetailInfo) }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -51,60 +48,35 @@ fun TodoItem(
                 .height(68.dp)
         ) {
 
-            val (image, colorTint, textDecoration) = if (task.status == ToDoStatus.IN_PROGRESS) {
-                Triple(
-                    R.drawable.ic_widget_round_radio_button_unchecked,
-                    ColorProvider(todoColor.toColor()),
-                    TextDecoration.None
-                )
-            } else {
-                Triple(
-                    R.drawable.ic_widget_round_check_circle,
-                    ColorProvider(
-                        todoColor.toColor().copy(alpha = AlphaDisabled)
-                    ),
-                    TextDecoration.LineThrough
-                )
-            }
-
-            val (taskTextColor, itemInfoTextColor) = if (task.status == ToDoStatus.IN_PROGRESS) {
-                GlanceTheme.colors.onSurface to ColorProvider(
-                    GlanceTheme.colors.onSurface.getColor(LocalContext.current)
-                        .copy(alpha = AlphaMedium)
-                )
-            } else {
-                ColorProvider(
-                    GlanceTheme.colors.onSurface.getColor(LocalContext.current)
-                        .copy(alpha = AlphaDisabled)
-                ) to ColorProvider(
-                    GlanceTheme.colors.onSurface.getColor(LocalContext.current)
-                        .copy(alpha = AlphaDisabled)
-                )
-            }
             Image(
-                provider = ImageProvider(image),
+                provider = ImageProvider(taskStatusUi.imageRes),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(colorTint),
+                colorFilter = ColorFilter.tint(
+                    ColorProvider(
+                        todoColor.toColor()
+                            .copy(alpha = taskStatusUi.imageColorFilterAlpha)
+                    )
+                ),
                 modifier = GlanceModifier
                     .padding(end = 8.dp)
-                    .clickable {
-                        onClick(task)
-                        Log.d("LOG_TAG---", "-TodoItem#62: $task")
-                    }
+                    .clickable { onClick(taskDetailInfo) }
             )
 
             Column {
                 Text(
-                    text = task.name,
+                    text = taskName,
                     modifier = GlanceModifier.padding(start = 4.dp),
                     style = TextStyle(
                         fontSize = MaterialTheme.typography.titleSmall.fontSize,
                         fontWeight = GlanceFontWeight.Medium,
-                        color = taskTextColor,
-                        textDecoration = textDecoration
+                        color = ColorProvider(taskStatusUi.taskColor),
+                        textDecoration = taskStatusUi.textDecoration
                     )
                 )
-                task.itemInfoDisplayable(LocalContext.current.resources, MaterialTheme.colorScheme.error)?.let { info ->
+                taskDetailInfo.itemInfoDisplayable(
+                    LocalContext.current.resources,
+                    taskStatusUi.taskDetailInfoTextColor
+                )?.let { info ->
                     Spacer(GlanceModifier.height(4.dp))
                     Text(
                         text = info.text,
@@ -112,7 +84,7 @@ fun TodoItem(
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             fontWeight = GlanceFontWeight.Medium,
-                            color = itemInfoTextColor
+                            color = ColorProvider(taskStatusUi.taskDetailInfoTextColor)
                         )
                     )
                 }

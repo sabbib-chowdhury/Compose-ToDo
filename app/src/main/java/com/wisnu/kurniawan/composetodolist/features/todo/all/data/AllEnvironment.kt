@@ -1,7 +1,6 @@
 package com.wisnu.kurniawan.composetodolist.features.todo.all.data
 
 import android.content.Context
-import android.util.Log
 import com.wisnu.kurniawan.composetodolist.features.widgets.di.WidgetDependencies
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.local.provider.ToDoListProvider
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.local.provider.ToDoTaskProvider
@@ -24,7 +23,6 @@ class AllEnvironment @Inject constructor(
     }
 
     override suspend fun toggleTaskStatus(toDoTask: ToDoTask) {
-        Log.d("LOG_TAG---", "AllEnvironment-toggleTaskStatus#28: $toDoTask")
         val currentDate = dateTimeProvider.now()
         toDoTask.toggleStatusHandler(
             currentDate,

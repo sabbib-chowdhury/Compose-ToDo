@@ -2,6 +2,7 @@ package com.wisnu.kurniawan.composetodolist.features.widgets
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
@@ -22,20 +23,21 @@ import androidx.glance.text.FontStyle
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import com.wisnu.kurniawan.composetodolist.R
-import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
-import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaMedium
-import com.wisnu.kurniawan.composetodolist.model.ToDoList
 
 @Composable
 internal fun TodoListHeader(
-    todo: ToDoList,
-    widgetTextStyle: TextStyle,
-    onAddTaskClick: (ToDoList) -> Action,
+    todoListId: String,
+    todoListName: String,
+    todoListColor: Color,
+    taskRowBackgroundColor: Color,
+    widgetTextStyle: Color,
+    onAddTaskClick: (String) -> Action,
 ) {
     Row(
         modifier = GlanceModifier
-            .background(todo.color.toColor().copy(alpha = AlphaMedium))
+            .background(todoListColor)
             .cornerRadius(4.dp)
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 4.dp),
@@ -45,7 +47,7 @@ internal fun TodoListHeader(
             modifier = GlanceModifier
                 .size(36.dp)
                 .cornerRadius(18.dp)
-                .background(todo.color.toColor())
+                .background(taskRowBackgroundColor)
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -54,18 +56,17 @@ internal fun TodoListHeader(
                     .size(36.dp)
                     .padding(vertical = 8.dp, horizontal = 8.dp),
                 provider = ImageProvider(R.drawable.ic_widget_more_horiz),
-                contentDescription = todo.name
+                contentDescription = todoListName
             )
         }
-        val titleSmall = MaterialTheme.typography.titleSmall
         Text(
             modifier = GlanceModifier
                 .wrapContentWidth()
                 .padding(8.dp),
-            text = todo.name,
+            text = todoListName,
             style = TextStyle(
-                color = widgetTextStyle.color,
-                fontSize = titleSmall.fontSize,
+                color = ColorProvider(widgetTextStyle),
+                fontSize = MaterialTheme.typography.titleSmall.fontSize,
                 fontWeight = FontWeight.Bold,
                 fontStyle = FontStyle.Normal,
             )
@@ -75,7 +76,7 @@ internal fun TodoListHeader(
             modifier = GlanceModifier
                 .size(36.dp)
                 .padding(horizontal = 4.dp)
-                .clickable(onAddTaskClick(todo)),
+                .clickable(onAddTaskClick(todoListId)),
             provider = ImageProvider(R.drawable.ic_add_circle_outline),
             contentDescription = "add task",
         )
