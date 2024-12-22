@@ -8,7 +8,6 @@ import com.wisnu.kurniawan.composetodolist.features.widgets.model.AllTodoListWid
 import com.wisnu.kurniawan.composetodolist.features.widgets.model.TaskStatusUi.InProgress.toTaskStatusUi
 import com.wisnu.kurniawan.composetodolist.features.widgets.model.TaskUiModel
 import com.wisnu.kurniawan.composetodolist.features.widgets.model.WidgetTodoItemUiModel
-import com.wisnu.kurniawan.composetodolist.features.widgets.model.WidgetUiModel
 import com.wisnu.kurniawan.composetodolist.foundation.di.DiName
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toColor
 import com.wisnu.kurniawan.composetodolist.model.Theme
@@ -50,7 +49,7 @@ open class AllListWidgetInteractor @Inject constructor(
     private val mutableActionState = MutableStateFlow(AllTodoListWidgetUiContract.Actions.UpdateWidget)
     val actionState: StateFlow<AllTodoListWidgetUiContract.Actions> = mutableActionState.asStateFlow()
 
-    val allLists: StateFlow<WidgetUiModel>
+    val allLists: StateFlow<AllTodoListWidgetUiContract.WidgetUiModel>
         get() = allEnvironment.getList().combine(
             allListWidgetRepository.getWidgetSettings()
         ) { todoLists, showCompletedTasks ->
@@ -79,12 +78,12 @@ open class AllListWidgetInteractor @Inject constructor(
                 )
             }
                 .let {
-                    WidgetUiModel(it)
+                    AllTodoListWidgetUiContract.WidgetUiModel(it)
                 }
         }.stateIn(
             CoroutineScope(Dispatchers.Main),
             started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            WidgetUiModel(emptyList())
+            AllTodoListWidgetUiContract.WidgetUiModel(emptyList())
         )
 
     val themes: Flow<Theme>

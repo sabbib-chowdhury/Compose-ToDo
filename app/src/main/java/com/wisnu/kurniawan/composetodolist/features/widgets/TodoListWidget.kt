@@ -28,7 +28,6 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.text.TextStyle
 import com.wisnu.kurniawan.composetodolist.features.widgets.domain.AllListWidgetInteractor
 import com.wisnu.kurniawan.composetodolist.features.widgets.model.AllTodoListWidgetUiContract
-import com.wisnu.kurniawan.composetodolist.features.widgets.model.WidgetUiModel
 import com.wisnu.kurniawan.composetodolist.foundation.datasource.preference.mapper.toGlanceColorProviders
 import com.wisnu.kurniawan.composetodolist.foundation.extension.toToDoColor
 import com.wisnu.kurniawan.composetodolist.foundation.theme.AlphaMedium
@@ -122,7 +121,10 @@ class TodoListWidget : GlanceAppWidget() {
 
 @Composable
 fun TodoWidget(
-    toDoLists: WidgetUiModel = WidgetUiModel(emptyList()),
+    toDoLists: AllTodoListWidgetUiContract.WidgetUiModel =
+        AllTodoListWidgetUiContract.WidgetUiModel(
+            emptyList()
+        ),
     widgetTextColor: Color = GlanceTheme.colors.onSurface.getColor(LocalContext.current),
     onClick: (ToDoTask) -> Unit,
     onAddTaskClick: (String) -> Action,
@@ -132,7 +134,7 @@ fun TodoWidget(
 
 @Composable
 private fun TodoList(
-    toDoLists: WidgetUiModel,
+    toDoLists: AllTodoListWidgetUiContract.WidgetUiModel,
     widgetTextColor: Color,
     onClick: (ToDoTask) -> Unit,
     onAddTaskClick: (String) -> Action,
