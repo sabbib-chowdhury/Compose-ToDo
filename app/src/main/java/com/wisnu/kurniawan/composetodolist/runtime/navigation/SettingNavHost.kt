@@ -27,7 +27,8 @@ fun NavGraphBuilder.SettingNavHost(
                 viewModel = viewModel,
                 onClickLogout = { navController.navigate(SettingFlow.Logout.route) },
                 onClickLanguage = { navController.navigate(SettingFlow.Language.route) },
-                onClickTheme = { navController.navigate(SettingFlow.Theme.route) }
+                onClickTheme = { navController.navigate(SettingFlow.Theme.route) },
+                onClickWidgetSettings = { navController.navigate(WidgetSettings.WidgetSettingsScreen.route) }
             )
         }
         bottomSheet(SettingFlow.Theme.route) {

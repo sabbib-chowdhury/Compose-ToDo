@@ -21,6 +21,7 @@ fun SettingScreen(
     onClickLogout: () -> Unit,
     onClickTheme: () -> Unit,
     onClickLanguage: () -> Unit,
+    onClickWidgetSettings: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -41,6 +42,9 @@ fun SettingScreen(
                             }
                             is SettingItem.Language -> {
                                 onClickLanguage()
+                            }
+                            is SettingItem.WidgetSettings -> {
+                                onClickWidgetSettings()
                             }
                         }
                     },
