@@ -249,6 +249,8 @@ dependencies {
     implementation libs.androidx.glance.material
     debugImplementation libs.androidx.ui.tooling
     debugImplementation libs.androidx.ui.tooling.preview
+//    implementation libs.shortcuts
+    implementation libs.widgets
     ///////////////
     // UNIT TEST SUPPORT
     //////

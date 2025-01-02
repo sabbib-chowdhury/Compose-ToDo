@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="add_task"
+        android:enabled="true"
+        android:icon="@drawable/ic_add_task"
+        android:shortLabel="@string/action_add_task_short_label"
+        android:longLabel="@string/action_add_task_long_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.wisnu.kurniawan.composetodolist"
+            android:targetClass="com.wisnu.kurniawan.composetodolist.AssistantActivity"
+            android:data="your_data_scheme://addTask" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="update_task"
+        android:enabled="true"
+        android:icon="@drawable/ic_update_task"
+        android:shortLabel="@string/action_update_task_short_label"
+        android:longLabel="@string/action_update_task_long_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.wisnu.kurniawan.composetodolist"
+            android:targetClass="com.wisnu.kurniawan.composetodolist.AssistantActivity"
+            android:data="your_data_scheme://updateTask" />
+    </shortcut>
+</shortcuts>
