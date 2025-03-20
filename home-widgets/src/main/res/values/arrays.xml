@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="runningSynonyms">
+        <item>Running</item>
+        <item>Run</item>
+        <item>Jog</item>
+        <item>Jogging</item>
+        <item>Sprint</item>
+    </array>
+</resources>

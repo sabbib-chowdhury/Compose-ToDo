@@ -1,12 +1,14 @@
-package com.wisnu.kurniawan.composetodolist
+package com.wisnu.kurniawan.composetodolist.home.widgets
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import java.util.regex.Pattern
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.ui.Modifier
 
 //@AndroidEntryPoint
 class AssistantActivity : AppCompatActivity() {
@@ -14,10 +16,11 @@ class AssistantActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
+            Scaffold { contentPadding ->
+                Row {}
+            }
         }
 
-        val intent = intent
         val data = intent.data
 
         if (data != null && data.scheme == "your_data_scheme") {

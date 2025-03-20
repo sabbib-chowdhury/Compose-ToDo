@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_add_task_short_label">add short label</string>
+    <string name="action_add_task_long_label">add tasks long label</string>
+    <string name="action_update_task_short_label">update short label v25</string>
+    <string name="action_update_task_long_label">update tasks long label v25</string>
+</resources>

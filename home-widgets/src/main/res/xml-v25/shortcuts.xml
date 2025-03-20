@@ -9,11 +9,12 @@
             android:targetPackage="com.wisnu.kurniawan.composetodolist"
             android:targetClass="com.wisnu.kurniawan.composetodolist.home.widgets.AssistantActivity"
             android:data="remindee://addTask" />
-        <capability-binding android:key="actions.intent.START_EXERCISE">
-            <parameter-binding
-                android:key="exercise.name"
-                android:value="@array/runningSynonyms"/>
-        </capability-binding>
+            <capability-binding android:key="actions.intent.GET_THING">
+                <parameter-binding
+                    android:key="q"
+                    android:name="thing.name"
+                    android:value="@array/runningSynonyms"/>
+            </capability-binding>
     </shortcut>
     <shortcut
         android:shortcutId="update_task"

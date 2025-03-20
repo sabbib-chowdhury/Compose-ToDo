@@ -1,15 +1,16 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 android {
-    namespace 'com.wisnu.kurniawan.composetodolist'
+    namespace 'com.wisnu.kurniawan.composetodolist.home.widgets'
     compileSdk 34
 
     defaultConfig {
-        minSdk 24
-
+        minSdk 21
+//        applicationId project.ext.appId
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -18,6 +19,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
         }
     }
     compileOptions {

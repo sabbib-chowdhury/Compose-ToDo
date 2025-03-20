@@ -89,6 +89,7 @@ google-material = { group = "com.google.android.material", name = "material", ve
 google-protobuf = { group = "com.google.protobuf", name = "protobuf-javalite", version.ref = "protobuf" }
 google-protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
 jetbrains-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-playservices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "composeLottie" }
 shortcuts = { module = "com.google.android.shortcuts:shortcuts", version.ref = "shortcutsVersion" }
 squareup-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
